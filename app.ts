@@ -1,50 +1,76 @@
-import {createConnection} from "typeorm";
-import express = require('express')
+import { createConnection } from "typeorm";
+import express = require("express");
+import * as cors from "cors";
 import { Chat } from "./entities/Chat";
+import bodyParser = require("body-parser");
 var app = express();
-var http = require('http').createServer(app);
-var io = require('socket.io')(http);
+var http = require("http").createServer(app);
+import * as socketio from "socket.io"
+var io : SocketIO.Server = socketio(http);
 
-createConnection().then((connection)=>{
+app.use(cors());
+app.options("*", cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static("public"));
 
-    app.use(express.static("../public"))
-    app.get("/getMessage/:u1/:u2",(req,res)=>{
-        connection.getRepository(Chat).find({
-            where:[{
-                sendUser:req.params.u1,
-                receiveUser:req.params.u2,
+createConnection()
+  .then(connection => {
+    app.post("/getMessages", (req, res) => {
+      let userId = req.body.userId;
+      let receiverId = req.body.receiverId;
+      console.log(userId,receiverId,req.body)
+      connection
+        .getRepository(Chat)
+        .find({
+          where: [
+            {
+              sendUser: userId,
+              receiveUser: receiverId
             },
             {
-                sendUser:req.params.u2,
-                receiveUser:req.params.u1,
+              sendUser: receiverId,
+              receiveUser: userId
             }
-        ],
-        relations:["sendUser","receiveUser"],
-        order:{
-            created_at:"ASC"
-        }
-
+          ],
+          relations: ["sendUser", "receiveUser"],
+          order: {
+            created_at: "ASC"
+          }
         })
-        .then((chats)=>{
-            res.send(chats)
-        }).catch((err)=>{
-            res.send(err)
+        .then(chats => {
+          res.send(chats);
         })
-    })
-
-
-    io.on('connection', function(socket){
-      console.log('a user connected');
+        .catch(err => {
+          res.send(err);
+        });
     });
-    
-    http.listen(3000, function(){
-      console.log('listening on *:3000');
+
+    io.on("connection", function(socket : SocketIO.Socket) {
+      console.log("a user connected");
+
+      socket.on("setCurrentUser",({userId})=>{
+          socket.join(`${userId}`);
+      })
+
+      socket.on("sendMessage",({userId,receiverId,text})=>{
+          console.log(userId,receiverId,text)
+        let chat = new Chat()
+        chat.message = text
+        chat.sendUser = userId
+        chat.receiveUser = receiverId
+        connection.manager.save(chat).then((value)=>{
+          console.log(value)
+
+            io.to(`${value.receiveUser}`).emit("newMessage",value)
+        })
+      })
     });
-    
-    
-    
-    
-    
-}).catch((err)=>{
-    console.log(err)
-})
+
+    http.listen(3000, function() {
+      console.log("listening on *:3000");
+    });
+  })
+  .catch(err => {
+    console.log(err);
+  });

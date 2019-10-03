@@ -8,16 +8,23 @@
     <div class="container">
         <br>
         <div class="jumbotron">
+                <h1 class="display-4">Load Message</h1>
+                <br>
+                <input id="lreceiver" class="form-control" placeholder="Receiver Id">
+                <br>
+                
+                <br>
+                <button id="send" class="btn btn-success" onclick="loadOldMessages(document.getElementById('lreceiver').value)">Send</button>
+            </div>
+        <div class="jumbotron">
             <h1 class="display-4">Send Message</h1>
-            <br>
-            <input id="sender" class="form-control" placeholder="Sender Id">
             <br>
             <input id="receiver" class="form-control" placeholder="Receiver Id">
             <br>
             <textarea id="message" class="form-control" placeholder="Your Message Here">
 </textarea>
             <br>
-            <button id="send" class="btn btn-success">Send</button>
+            <button id="send" class="btn btn-success" onclick="sendMessage()">Send</button>
         </div>
         <div id="messages">
 
@@ -25,57 +32,51 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"
         integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-        <script src="/socket.io/socket.io.js"></script>
-        <script src="https://gmousse.github.io/dataframe-js/dist/dataframe.min.js"></script>
+        <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+       
         <script>
-        var socket = io();
-        var DataFrame = dfjs.DataFrame;
-        const df = new DataFrame([{c1: 1, c2: 2, c3: 3}, {c1:3, c2: 4, c3: 5}], ['c1', 'c2', 'c3']);
-        console.log(df);
-        let senderId = prompt('Please enter your senderID : ');
-        let nspSender = `/${senderId}`;
-        var nsp = io(nspSender);
-            nsp.on('toMessage', function (data) {
-                console.log('Message received')
-                console.log(data);
-            });
-        $(() => {
-         
-            $("#send").click(() => {
-                sendMessage({
-                    sender: $("#sender").val(),
-                    receiver: $("#receiver").val(),
-                    message: $("#message").val()
-                });
-            });
-         getMessages({senderId:senderId})
+            const HOST = "http://localhost:3000"
+            var UserId = prompt("Enter UserID");
+
+        var socket = io(HOST);
+        var messages = [];
+        var isLoaded = false
+
+        socket.on("connect",()=>{
+            console.log("connected to server");
+            socket.emit("setCurrentUser",{userId:UserId})
         })
 
-        function addMessages(message) {
-           
-        }
-        function getMessages(senderId) {
-        //   socket.emit('get messages',senderId);
-           $.post("http://localhost:3001/getMessages", senderId);
-    //        $("#messages").append(`
-    //   <h4> ${message.sender} </h4>
-    //   <p>  ${message.message} </p>`)
+        socket.on("newMessage",(message)=>{
+            console.table(message)
+        })
+
+         async function loadOldMessages(receiverId){
+             
+            let req = await fetch(`${HOST}/getMessages`,{
+                method:"POST",
+                headers:{
+                    "Content-Type": "application/json"
+                },
+                body:JSON.stringify({userId:UserId,receiverId:receiverId})
+            });
+            let data = await req.json()
+
+            console.table(data);
+             return data;
         }
 
-        function sendMessage(message) {
-            console.log(message)
-            socket.emit('new message', message);
-         //   $.post("http://localhost:3000/sendMessages", message);
+        function sendMessage(){
+            let message = document.getElementById("message").value;
+            let receiver = document.getElementById("receiver").value
+
+            socket.emit("sendMessage",{
+                userId:UserId,
+                receiverId:receiver,
+                text:message
+            })
         }
-        function receiveMessage(message) {
-            console.log(message)// sender, receiver
-            const nsp = io(`/${message.sender}`);
-            nsp.on('toMessage', function (data) {
-                console.log('Message received')
-                console.log(data);
-            });
-        }
-       // receiveMessage();
+        
 
     </script>
 </body>
