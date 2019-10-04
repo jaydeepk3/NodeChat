@@ -51,6 +51,9 @@
             console.table(message)
         })
 
+        socket.on("messageReaded",(data)=>{
+            console.table(data)
+        })
          async function loadOldMessages(receiverId){
              
             let req = await fetch(`${HOST}/getMessages`,{

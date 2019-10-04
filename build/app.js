@@ -47,6 +47,22 @@ typeorm_1.createConnection()
     });
     io.on("connection", function (socket) {
         console.log("a user connected");
+        socket.on('messageReaded', function (_a) {
+            var userId = _a.userId, receiverId = _a.receiverId, lastMessageId = _a.lastMessageId;
+            connection.createQueryBuilder().update(Chat_1.Chat).set({
+                isReaded: 1,
+            }).where('id <= :id AND sendUserId = :sendUserId AND receiveUserId = :receiveUserId', {
+                id: lastMessageId,
+                sendUserId: userId,
+                receiveUserId: receiverId
+            }).execute().then(function (value) {
+                if (value.raw.affectedRows) {
+                    io.to("" + userId).emit('messageReaded', { receiverId: receiverId, lastMessageId: lastMessageId });
+                }
+            }).catch(function (err) {
+                console.log(err);
+            });
+        });
         socket.on("setCurrentUser", function (_a) {
             var userId = _a.userId;
             socket.join("" + userId);

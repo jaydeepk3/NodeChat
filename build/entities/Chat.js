@@ -34,6 +34,14 @@ var Chat = /** @class */ (function () {
         })
     ], Chat.prototype, "message", void 0);
     __decorate([
+        typeorm_1.Column({
+            nullable: false,
+            name: "isReaded",
+            type: "int",
+            default: 0
+        })
+    ], Chat.prototype, "isReaded", void 0);
+    __decorate([
         typeorm_1.Column("timestamp", {
             nullable: false,
             default: function () { return "'CURRENT_TIMESTAMP(6)'"; },

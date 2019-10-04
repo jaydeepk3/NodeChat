@@ -48,7 +48,23 @@ createConnection()
 
     io.on("connection", function(socket : SocketIO.Socket) {
       console.log("a user connected");
-
+      socket.on('messageReaded',({userId,receiverId,lastMessageId})=>{
+        connection.createQueryBuilder().update(Chat).set({
+          isReaded:1,
+        }).where('id <= :id AND sendUserId = :sendUserId AND receiveUserId = :receiveUserId',
+        {
+          id : lastMessageId,
+          sendUserId : userId,
+          receiveUserId : receiverId
+        }
+        ).execute().then(value =>{
+          if(value.raw.affectedRows){
+            io.to(`${userId}`).emit('messageReaded',{receiverId,lastMessageId})
+          }
+        }).catch(err =>{
+          console.log(err)
+        })
+      })
       socket.on("setCurrentUser",({userId})=>{
           socket.join(`${userId}`);
       })
@@ -74,3 +90,4 @@ createConnection()
   .catch(err => {
     console.log(err);
   });
+

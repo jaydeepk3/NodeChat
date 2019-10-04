@@ -34,6 +34,13 @@ export class Chat {
         })
     message:string;
         
+    @Column({ 
+        nullable:false,
+        name:"isReaded",
+        type:"int",
+        default:0
+        })
+    isReaded:number;
 
     @Column("timestamp",{ 
         nullable:false,
