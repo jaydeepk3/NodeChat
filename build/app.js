@@ -20,6 +20,9 @@ typeorm_1.createConnection()
         var userId = req.body.userId;
         var receiverId = req.body.receiverId;
         console.log(userId, receiverId, req.body);
+        //.select("user")
+        // .from(User, "user")
+        // .where("user.id = :id", { id: 1 })
         connection
             .getRepository(Chat_1.Chat)
             .find({
@@ -39,7 +42,13 @@ typeorm_1.createConnection()
             }
         })
             .then(function (chats) {
-            res.send(chats);
+            var tempChat = [];
+            chats.forEach(function (element) {
+                console.log(element);
+                tempChat.push({ Id: element.Id, message: element.message, created_at: element.created_at, isReaded: element.isReaded, receiveUserId: element.receiveUser.id, sendUserId: element.sendUser.id });
+            });
+            console.log(tempChat);
+            res.send(tempChat);
         })
             .catch(function (err) {
             res.send(err);

@@ -1,4 +1,4 @@
-import { createConnection } from "typeorm";
+import { createConnection, ChangeStream } from "typeorm";
 import express = require("express");
 import * as cors from "cors";
 import { Chat } from "./entities/Chat";
@@ -20,6 +20,9 @@ createConnection()
       let userId = req.body.userId;
       let receiverId = req.body.receiverId;
       console.log(userId,receiverId,req.body)
+      //.select("user")
+    // .from(User, "user")
+    // .where("user.id = :id", { id: 1 })
       connection
         .getRepository(Chat)
         .find({
@@ -33,13 +36,19 @@ createConnection()
               receiveUser: userId
             }
           ],
-          relations: ["sendUser", "receiveUser"],
+         relations: ["sendUser", "receiveUser"],
           order: {
             created_at: "ASC"
           }
         })
         .then(chats => {
-          res.send(chats);
+          let tempChat = [];
+           chats.forEach(element => {
+             console.log(element);
+            tempChat.push({Id:element.Id,message:element.message,created_at:element.created_at,isReaded:element.isReaded,receiveUserId: element.receiveUser.id,sendUserId:element.sendUser.id})
+           })
+          console.log(tempChat);
+          res.send(tempChat);
         })
         .catch(err => {
           res.send(err);
