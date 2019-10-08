@@ -8,6 +8,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
 var Chat_1 = require("./Chat");
+var blocks_1 = require("./blocks");
+var devices_1 = require("./devices");
 var users = /** @class */ (function () {
     function users() {
     }
@@ -118,6 +120,12 @@ var users = /** @class */ (function () {
     __decorate([
         typeorm_1.OneToMany(function () { return Chat_1.Chat; }, function (Chat) { return Chat.receiveUser; }, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     ], users.prototype, "chats2", void 0);
+    __decorate([
+        typeorm_1.OneToMany(function () { return blocks_1.blocks; }, function (blocks) { return blocks.user; }, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    ], users.prototype, "blockss", void 0);
+    __decorate([
+        typeorm_1.OneToMany(function () { return devices_1.devices; }, function (devices) { return devices.user; }, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    ], users.prototype, "devicess", void 0);
     users = __decorate([
         typeorm_1.Entity("users", { schema: "loungemate" }),
         typeorm_1.Index("users_email_unique", ["email",], { unique: true }),

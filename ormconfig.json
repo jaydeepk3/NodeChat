@@ -8,6 +8,7 @@
     "password": "root",
     "database": "LoungeMate",
     "synchronize": false,
+    "charset" : "utf8mb4",
     "entities": ["./build/entities/*.js"]
   }
 ]

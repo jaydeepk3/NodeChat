@@ -1,5 +1,7 @@
 import {BaseEntity,Column,Entity,Index,JoinColumn,JoinTable,ManyToMany,ManyToOne,OneToMany,OneToOne,PrimaryColumn,PrimaryGeneratedColumn,RelationId} from "typeorm";
 import {Chat} from "./Chat";
+import {blocks} from "./blocks";
+import {devices} from "./devices";
 
 
 @Entity("users" ,{schema:"loungemate" } )
@@ -131,5 +133,15 @@ export class users {
    
     @OneToMany(()=>Chat, (Chat: Chat)=>Chat.receiveUser,{ onDelete: 'CASCADE' ,onUpdate: 'CASCADE' })
     chats2:Chat[];
+    
+
+   
+    @OneToMany(()=>blocks, (blocks: blocks)=>blocks.user,{ onDelete: 'CASCADE' ,onUpdate: 'CASCADE' })
+    blockss:blocks[];
+    
+
+   
+    @OneToMany(()=>devices, (devices: devices)=>devices.user,{ onDelete: 'CASCADE' ,onUpdate: 'CASCADE' })
+    devicess:devices[];
     
 }
