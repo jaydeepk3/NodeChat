@@ -10,6 +10,7 @@ var app = express();
 var http = require("http").createServer(app);
 var socketio = require("socket.io");
 var devices_1 = require("./entities/devices");
+var users_1 = require("./entities/users");
 var io = socketio(http);
 app.use(cors());
 app.options("*", cors());
@@ -124,13 +125,23 @@ typeorm_1.createConnection()
             chat.receiveUser = receiverId;
             connection.manager.save(chat).then(function (value) {
                 console.log(value);
-                connection.getRepository(devices_1.devices).findOne({ where: { user: receiverId }
-                }).then(function (data) {
-                    if (data) {
-                        sendNotification(data.push_token, 'new message', text, value);
+                connection.getRepository(users_1.users).findOne({ where: { user: receiverId }
+                }).then(function (user) {
+                    if (user) {
+                        console.log(user);
+                        connection.getRepository(devices_1.devices).findOne({ where: { user: receiverId }
+                        }).then(function (data) {
+                            if (data) {
+                                console.log(data);
+                                sendNotification(data.push_token, user.name, text, value);
+                            }
+                            else {
+                                console.log('Device not found');
+                            }
+                        });
                     }
                     else {
-                        console.log('Device not found');
+                        console.log('User not found');
                     }
                 });
                 io.to("" + value.receiveUser).emit("newMessage", value);

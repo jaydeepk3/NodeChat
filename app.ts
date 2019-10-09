@@ -8,6 +8,7 @@ var app = express();
 var http = require("http").createServer(app);
 import * as socketio from "socket.io";
 import { devices } from "./entities/devices";
+import { users } from "./entities/users";
 
 var io: SocketIO.Server = socketio(http);
 
@@ -131,16 +132,29 @@ createConnection()
     
         connection.manager.save(chat).then(value => {
            console.log(value);
-          connection.getRepository(devices).findOne({where:{user:receiverId} 
-          }).then(data=>
-            {
-              if(data){
-                sendNotification(data.push_token,'new message',text,value)
-              } else{
-                console.log('Device not found')
-              }
-             
-            })
+           connection.getRepository(users).findOne({where:{user:receiverId} 
+           }).then(user=>
+             {
+ 
+               if(user){
+                 console.log(user)
+                 connection.getRepository(devices).findOne({where:{user:receiverId} 
+                 }).then(data=>
+                   {
+                     if(data){
+                       console.log(data)
+                       sendNotification(data.push_token,user.name,text,value)
+                     } else{
+                       console.log('Device not found')
+                     }
+                    
+                   })
+               } else{
+                 console.log('User not found')
+               }
+              
+             })
+         
          
           io.to(`${value.receiveUser}`).emit("newMessage", value);
         });
