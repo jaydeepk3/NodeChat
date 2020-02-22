@@ -2,11 +2,11 @@
   {
     "name": "default",
     "type": "mysql",
-    "host": "localhost",
-    "port": 8889,
-    "username": "root",
-    "password": "root",
-    "database": "LoungeMate",
+    "host": "loungemate-db.c2liuj3o5xke.ap-south-1.rds.amazonaws.com",
+    "port": 3306,
+    "username": "admin_loungemate",
+    "password": "LoungeMate19",
+    "database": "loungemate19",
     "synchronize": false,
     "charset" : "utf8mb4",
     "entities": ["./build/entities/*.js"]
