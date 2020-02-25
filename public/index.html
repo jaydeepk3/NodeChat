@@ -32,10 +32,10 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"
         integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-        <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+        <script src="http://theloungemate.com:3000/socket.io/socket.io.js"></script>
        
         <script>
-            const HOST = "http://localhost:3000"
+            const HOST = "http://theloungemate.com:3000"
             var UserId = prompt("Enter UserID");
 
         var socket = io(HOST);
@@ -72,9 +72,10 @@
         }
 
         function sendMessage(){
+            console.log('sendmessage')
             let message = document.getElementById("message").value;
             let receiver = document.getElementById("receiver").value
-
+    
             socket.emit("sendMessage",{
                 userId:UserId,
                 receiverId:receiver,

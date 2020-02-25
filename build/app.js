@@ -124,15 +124,16 @@ typeorm_1.createConnection()
             chat.sendUser = userId;
             chat.receiveUser = receiverId;
             connection.manager.save(chat).then(function (value) {
-                console.log(value);
-                connection.getRepository(users_1.users).findOne({ where: { user: receiverId }
+                console.log('value', value);
+                connection.getRepository(users_1.users).findOne({ where: { id: receiverId }
                 }).then(function (user) {
                     if (user) {
-                        console.log(user);
-                        connection.getRepository(devices_1.devices).findOne({ where: { user: receiverId }
+                        console.log('user', user);
+                        connection.getRepository(devices_1.devices).findOne({ where: { user_id: receiverId }
                         }).then(function (data) {
                             if (data) {
-                                console.log(data);
+                                console.log('data', data);
+                                console.log('sendNotification', data.push_token, user.name, text, value);
                                 sendNotification(data.push_token, user.name, text, value);
                             }
                             else {

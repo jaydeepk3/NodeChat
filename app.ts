@@ -118,6 +118,7 @@ createConnection()
             console.log(err);
           });
       });
+
       socket.on("setCurrentUser", ({ userId }) => {
         console.log(userId);
         socket.join(`${userId}`);
@@ -131,18 +132,18 @@ createConnection()
         chat.receiveUser = receiverId;
     
         connection.manager.save(chat).then(value => {
-           console.log(value);
-           connection.getRepository(users).findOne({where:{user:receiverId} 
+           console.log('value',value);
+           connection.getRepository(users).findOne({where:{id:receiverId} 
            }).then(user=>
              {
  
                if(user){
-                 console.log(user)
-                 connection.getRepository(devices).findOne({where:{user:receiverId} 
+                 console.log('user',user)
+                 connection.getRepository(devices).findOne({where:{user_id:receiverId} 
                  }).then(data=>
                    {
                      if(data){
-                       console.log(data)
+                       console.log('data',data)
                        sendNotification(data.push_token,user.name,text,value)
                      } else{
                        console.log('Device not found')
