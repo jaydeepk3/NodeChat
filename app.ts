@@ -72,13 +72,13 @@ createConnection()
           let tempChat = [];
           chats.forEach(element => {
             console.log(element);
-            let created = moment(element.created_at).format('L');  
-            let at = moment(element.created_at).format('LTS');
-            created = created.split("/").reverse().join("/")
+            // let created = moment(element.created_at).format('L');  
+            // let at = moment(element.created_at).format('LTS');
+            // created = created.split("/").reverse().join("/")
             tempChat.push({
               Id: element.Id,
               message: element.message,
-              created_at: created + ' ' + at,
+              created_at: element.created_at,
               isReaded: element.isReaded,
               receiveUser: element.receiveUser.id,
               sendUser: element.sendUser.id
@@ -138,7 +138,7 @@ createConnection()
         connection.manager.save(chat).then(value => {
            console.log('value',value);
            connection.getRepository(users).findOne({ 
-             where:{id:receiverId}}, ).then(user=>
+             where:{id:userId}}, ).then(user=>
              {
  
                if(user){

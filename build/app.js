@@ -131,7 +131,7 @@ typeorm_1.createConnection()
             connection.manager.save(chat).then(function (value) {
                 console.log('value', value);
                 connection.getRepository(users_1.users).findOne({
-                    where: { id: receiverId }
+                    where: { id: userId }
                 }).then(function (user) {
                     if (user) {
                         console.log('user', user);
