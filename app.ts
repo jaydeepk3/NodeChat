@@ -9,7 +9,7 @@ var http = require("http").createServer(app);
 import * as socketio from "socket.io";
 import { devices } from "./entities/devices";
 import { users } from "./entities/users";
-
+import * as moment from "moment";
 var io: SocketIO.Server = socketio(http);
 
 app.use(cors());
@@ -23,6 +23,7 @@ let fcm = new Fcm(
 );
 
 function sendNotification(fcmToken, title, body, data) {
+  console.log('fcmToken',fcmToken)
   fcm.send({
     to: fcmToken,
     collapse_key: "new_messages",
@@ -71,16 +72,19 @@ createConnection()
           let tempChat = [];
           chats.forEach(element => {
             console.log(element);
+            let created = moment(element.created_at).format('L');  
+            let at = moment(element.created_at).format('LTS');
+            created = created.split("/").reverse().join("/")
             tempChat.push({
               Id: element.Id,
               message: element.message,
-              created_at: element.created_at,
+              created_at: created + ' ' + at,
               isReaded: element.isReaded,
               receiveUser: element.receiveUser.id,
               sendUser: element.sendUser.id
             });
           });
-          console.log(tempChat);
+         // console.log(tempChat);
           res.send(tempChat);
         })
         .catch(err => {
@@ -133,17 +137,18 @@ createConnection()
     
         connection.manager.save(chat).then(value => {
            console.log('value',value);
-           connection.getRepository(users).findOne({where:{id:receiverId} 
-           }).then(user=>
+           connection.getRepository(users).findOne({ 
+             where:{id:receiverId}}, ).then(user=>
              {
  
                if(user){
                  console.log('user',user)
-                 connection.getRepository(devices).findOne({where:{user_id:receiverId} 
+                 console.log('receiverId',chat.receiveUser)
+                 connection.getRepository(devices).findOne({where:{user:{id:receiverId}}, relations:["user"] 
                  }).then(data=>
                    {
                      if(data){
-                       console.log('data',data)
+                       console.log(data)
                        sendNotification(data.push_token,user.name,text,value)
                      } else{
                        console.log('Device not found')

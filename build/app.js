@@ -11,6 +11,7 @@ var http = require("http").createServer(app);
 var socketio = require("socket.io");
 var devices_1 = require("./entities/devices");
 var users_1 = require("./entities/users");
+var moment = require("moment");
 var io = socketio(http);
 app.use(cors());
 app.options("*", cors());
@@ -19,6 +20,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 var fcm = new Fcm("AAAAfucNlHQ:APA91bEV3atOmEZL6G8xHvpudxodCOtYITlAqmjCAeNOAahxpcTeRzfPy7QoQIa3J_AkU3rIPSkTtx_NgsBlIdYO1N1LcoGzjmQqPUTkQMuJoVMC531pEUAoWYwA71-IN0JwukfAbn0h");
 function sendNotification(fcmToken, title, body, data) {
+    console.log('fcmToken', fcmToken);
     fcm.send({
         to: fcmToken,
         collapse_key: "new_messages",
@@ -67,16 +69,19 @@ typeorm_1.createConnection()
             var tempChat = [];
             chats.forEach(function (element) {
                 console.log(element);
+                var created = moment(element.created_at).format('L');
+                var at = moment(element.created_at).format('LTS');
+                created = created.split("/").reverse().join("/");
                 tempChat.push({
                     Id: element.Id,
                     message: element.message,
-                    created_at: element.created_at,
+                    created_at: created + ' ' + at,
                     isReaded: element.isReaded,
                     receiveUser: element.receiveUser.id,
                     sendUser: element.sendUser.id
                 });
             });
-            console.log(tempChat);
+            // console.log(tempChat);
             res.send(tempChat);
         })
             .catch(function (err) {
@@ -125,15 +130,16 @@ typeorm_1.createConnection()
             chat.receiveUser = receiverId;
             connection.manager.save(chat).then(function (value) {
                 console.log('value', value);
-                connection.getRepository(users_1.users).findOne({ where: { id: receiverId }
+                connection.getRepository(users_1.users).findOne({
+                    where: { id: receiverId }
                 }).then(function (user) {
                     if (user) {
                         console.log('user', user);
-                        connection.getRepository(devices_1.devices).findOne({ where: { user_id: receiverId }
+                        console.log('receiverId', chat.receiveUser);
+                        connection.getRepository(devices_1.devices).findOne({ where: { user: { id: receiverId } }, relations: ["user"]
                         }).then(function (data) {
                             if (data) {
-                                console.log('data', data);
-                                console.log('sendNotification', data.push_token, user.name, text, value);
+                                console.log(data);
                                 sendNotification(data.push_token, user.name, text, value);
                             }
                             else {

@@ -15,40 +15,44 @@ var devices = /** @class */ (function () {
         typeorm_1.PrimaryGeneratedColumn({
             type: "bigint",
             unsigned: true,
-            name: "id"
+            name: "id",
         })
     ], devices.prototype, "id", void 0);
     __decorate([
-        typeorm_1.ManyToOne(function () { return users_1.users; }, function (users) { return users.devicess; }, { nullable: false, onDelete: 'CASCADE', onUpdate: 'CASCADE' }),
-        typeorm_1.JoinColumn({ name: 'user_id' })
+        typeorm_1.ManyToOne(function () { return users_1.users; }, function (users) { return users.devicess; }, {
+            nullable: false,
+            onDelete: "CASCADE",
+            onUpdate: "CASCADE",
+        }),
+        typeorm_1.JoinColumn({ name: "user_id" })
     ], devices.prototype, "user", void 0);
     __decorate([
         typeorm_1.Column("varchar", {
             nullable: true,
-            name: "device_id"
+            name: "device_id",
         })
     ], devices.prototype, "device_id", void 0);
     __decorate([
         typeorm_1.Column("text", {
             nullable: true,
-            name: "push_token"
+            name: "push_token",
         })
     ], devices.prototype, "push_token", void 0);
     __decorate([
         typeorm_1.Column("timestamp", {
             nullable: true,
-            name: "created_at"
+            name: "created_at",
         })
     ], devices.prototype, "created_at", void 0);
     __decorate([
         typeorm_1.Column("timestamp", {
             nullable: true,
-            name: "updated_at"
+            name: "updated_at",
         })
     ], devices.prototype, "updated_at", void 0);
     devices = __decorate([
         typeorm_1.Entity("devices", { schema: "loungemate" }),
-        typeorm_1.Index("devices_user_id_foreign", ["user",])
+        typeorm_1.Index("devices_user_id_foreign", ["user"])
     ], devices);
     return devices;
 }());
